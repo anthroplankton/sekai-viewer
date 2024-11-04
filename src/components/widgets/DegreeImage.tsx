@@ -77,7 +77,7 @@ const DegreeImage: React.FC<
             if (honorId && honorLevel) {
               // set honor
               setHonor(honors.find((honor) => honor.id === honorId));
-              setHonorLevel(honorLevel);
+              setHonorLevel(_honorLevel ?? honorLevel);
             } else {
               console.warn(
                 `unable to find ${region} honor from resource box id ${resourceBoxId}`
@@ -110,9 +110,9 @@ const DegreeImage: React.FC<
           );
           setHonor(_honor);
           if (honorDetail) {
-            setHonorLevel(honorDetail.resourceLevel);
+            setHonorLevel(_honorLevel ?? honorDetail.resourceLevel);
           } else if (_honor?.levels.length) {
-            setHonorLevel(_honor.levels[0].level);
+            setHonorLevel(_honorLevel ?? _honor.levels[0].level);
           }
         }
       }
