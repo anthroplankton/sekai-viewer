@@ -169,13 +169,15 @@ const DetailDialog: React.FC<{
                 alignItems="center"
               >
                 <Typography variant="subtitle1" style={{ fontWeight: 600 }}>
-                  {t("common:honor")}
+                  {t("common:rewards")}
                 </Typography>
-                <DegreeImage
-                  honorId={data.id}
-                  honorLevel={level.level}
-                  type="mission_reward"
-                />
+                <Grid item xs={6}>
+                  <DegreeImage
+                    honorId={data.id}
+                    honorLevel={level.level}
+                    type="mission_reward"
+                  />
+                </Grid>
               </Grid>
             )}
             <Divider style={{ margin: "1% 0" }} />
