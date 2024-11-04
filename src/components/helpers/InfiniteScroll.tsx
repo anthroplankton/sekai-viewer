@@ -136,7 +136,7 @@ function InfiniteScroll<T>({
 
   useEffect(() => {
     const currentObserver = new IntersectionObserver(observerCallback, {
-      threshold: 0.5,
+      threshold: 0.2,
     });
     const currentElement = listElementRef.current;
     if (currentElement) currentObserver.observe(currentElement);
