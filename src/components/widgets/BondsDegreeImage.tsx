@@ -6,8 +6,9 @@ import {
   getRemoteImageSize,
   useCachedData,
 } from "../../utils";
-import { degreeFrameMap, degreeFramSubMap } from "../../utils/resources";
+import { degreeFrameMap, degreeFrameSubMap } from "../../utils/resources";
 import degreeLevelIcon from "../../assets/frame/icon_degreeLv.png";
+import degreeLevel6Icon from "../../assets/frame/icon_degreeLv6.png";
 import { observer } from "mobx-react-lite";
 import { useRootStore } from "../../stores/root";
 import Svg from "../styled/Svg";
@@ -160,10 +161,10 @@ const BondsDegreeImage: React.FC<
       const func = async () => {
         if (sdLeft) {
           const size = await getRemoteImageSize(sdLeft);
-          setSdLeftHeight(size.height);
-          setSdLeftWidth(size.width);
-          setSdLeftOffsetX(20);
-          setSdLeftOffsetY(93 - size.height);
+          setSdLeftHeight(sub ? size.height / 1.35 : size.height);
+          setSdLeftWidth(sub ? size.width / 1.35 : size.width);
+          setSdLeftOffsetX(sub ? 28 : 20);
+          setSdLeftOffsetY(sub ? 77 - size.height / 1.35 : 93 - size.height);
         }
       };
 
@@ -174,10 +175,12 @@ const BondsDegreeImage: React.FC<
       const func = async () => {
         if (sdRight) {
           const size = await getRemoteImageSize(sdRight);
-          setSdRightHeight(size.height);
-          setSdRightWidth(size.width);
-          setSdRightOffsetX((sub ? 160 : 360) - size.width);
-          setSdRightOffsetY(93 - size.height);
+          setSdRightHeight(sub ? size.height / 1.35 : size.height);
+          setSdRightWidth(sub ? size.width / 1.35 : size.width);
+          setSdRightOffsetX(
+            (sub ? 172 : 360) - (sub ? size.width / 1.35 : size.width)
+          );
+          setSdRightOffsetY(sub ? 78 - size.height / 1.35 : 93 - size.height);
         }
       };
 
@@ -275,14 +278,26 @@ const BondsDegreeImage: React.FC<
           {/* degree level */}
           {!!honorLevel &&
             honor.levels.length > 1 &&
-            Array.from({ length: honorLevel }).map((_, idx) => (
+            Array.from({ length: Math.min(5, honorLevel) }).map((_, idx) => (
               <image
                 key={idx}
                 href={degreeLevelIcon}
-                x={54 + idx * 16}
-                y="64"
-                height="16"
-                width="16"
+                x={sub ? 48 + idx * 14 : 54 + idx * 16}
+                y={64}
+                height={sub ? 14 : 16}
+                width={sub ? 14 : 16}
+              />
+            ))}
+          {!!honorLevel &&
+            honor.levels.length > 1 &&
+            Array.from({ length: honorLevel - 5 }).map((_, idx) => (
+              <image
+                key={idx}
+                href={degreeLevel6Icon}
+                x={sub ? 48 + idx * 14 : 54 + idx * 16}
+                y={64}
+                height={sub ? 14 : 16}
+                width={sub ? 14 : 16}
               />
             ))}
         </svg>
@@ -290,7 +305,7 @@ const BondsDegreeImage: React.FC<
         <image
           href={
             sub
-              ? degreeFramSubMap[honor.honorRarity]
+              ? degreeFrameSubMap[honor.honorRarity]
               : degreeFrameMap[honor.honorRarity]
           }
           x="0"

@@ -8,7 +8,7 @@ import {
   ICompactResourceBoxDetail,
 } from "../../types.d";
 import { getRemoteAssetURL, useCachedData, useCompactData } from "../../utils";
-import { degreeFrameMap, degreeFramSubMap } from "../../utils/resources";
+import { degreeFrameMap, degreeFrameSubMap } from "../../utils/resources";
 import degreeLevelIcon from "../../assets/frame/icon_degreeLv.png";
 import degreeLevel6Icon from "../../assets/frame/icon_degreeLv6.png";
 import { observer } from "mobx-react-lite";
@@ -21,6 +21,7 @@ const DegreeImage: React.FC<
     honorId?: number;
     type?: string;
     honorLevel?: number;
+    drawHonorLevel?: boolean;
     sub?: boolean;
   } & React.HTMLProps<HTMLDivElement>
 > = observer(
@@ -30,6 +31,7 @@ const DegreeImage: React.FC<
     honorId,
     style,
     honorLevel: _honorLevel,
+    drawHonorLevel = true,
     sub = false,
   }) => {
     const { region } = useRootStore();
@@ -43,6 +45,7 @@ const DegreeImage: React.FC<
     const [honor, setHonor] = useState<IHonorInfo>();
     const [honorGroup, setHonorGroup] = useState<IHonorGroup>();
     const [honorLevel, setHonorLevel] = useState(_honorLevel);
+    const [isDrawHonorLevel, setIsDrawHonorLevel] = useState(drawHonorLevel);
     const [degreeImage, setDegreeImage] = useState<string>("");
     const [degreeFrameImage, setDegreeFrameImage] = useState<string>("");
     const [degreeRankImage, setDegreeRankImage] = useState<string>("");
@@ -98,20 +101,26 @@ const DegreeImage: React.FC<
                 (detail) => detail.resourceType === "honor"
               );
           }
-          setHonor(
-            honors.find((honor) =>
-              resourceBoxId && honorDetail
-                ? honor.id === honorDetail.resourceId
-                : honorId
-                  ? honor.id === honorId
-                  : false
-            )
+          const _honor = honors.find((honor) =>
+            resourceBoxId && honorDetail
+              ? honor.id === honorDetail.resourceId
+              : honorId
+                ? honor.id === honorId
+                : false
           );
+          setHonor(_honor);
           if (honorDetail) {
             setHonorLevel(honorDetail.resourceLevel);
+          } else if (_honor?.levels.length) {
+            setHonorLevel(_honor.levels[0].level);
           }
         }
       }
+
+      return () => {
+        setHonor(undefined);
+        setHonorLevel(_honorLevel ?? undefined);
+      };
     }, [
       honors,
       resourceBoxes,
@@ -120,11 +129,27 @@ const DegreeImage: React.FC<
       honorId,
       region,
       compactResourceBoxDetails,
+      _honorLevel,
     ]);
 
     useEffect(() => {
       if (honor && honorGroups) {
-        setHonorGroup(honorGroups.find((hg) => hg.id === honor.groupId));
+        const honorGroup = honorGroups.find((hg) => hg.id === honor.groupId);
+        setHonorGroup(honorGroup);
+
+        if (honorGroup) {
+          setIsDrawHonorLevel(
+            drawHonorLevel &&
+              (!["event", "rank_match", "achievement"].includes(
+                honorGroup.honorType
+              ) ||
+                (honorGroup.honorType == "achievement" &&
+                  [33, 36, 37, 52, 72, 73, 74, 75, 76, 77].includes(
+                    honorGroup.id
+                  )))
+          );
+        }
+
         if (honor.assetbundleName)
           setIsWorldLinkDegree(/.*(_cp\d)$/.test(honor.assetbundleName));
         else if (!!honorLevel && honor.levels[honorLevel - 1].assetbundleName) {
@@ -152,8 +177,9 @@ const DegreeImage: React.FC<
       return () => {
         setHonorGroup(undefined);
         setIsWorldLinkDegree(false);
+        setIsDrawHonorLevel(drawHonorLevel ?? true);
       };
-    }, [honor, honorGroups, honorLevel]);
+    }, [drawHonorLevel, honor, honorGroups, honorLevel]);
 
     useEffect(() => {
       if (honor) {
@@ -207,15 +233,29 @@ const DegreeImage: React.FC<
           } else if (honor.honorRarity) {
             setDegreeFrameImage(
               sub
-                ? degreeFramSubMap[honor.honorRarity]
+                ? degreeFrameSubMap[honor.honorRarity]
                 : degreeFrameMap[honor.honorRarity]
             );
           }
         } else if (honor.honorRarity) {
           setDegreeFrameImage(
             sub
-              ? degreeFramSubMap[honor.honorRarity]
+              ? degreeFrameSubMap[honor.honorRarity]
               : degreeFrameMap[honor.honorRarity]
+          );
+        } else if (
+          honor.levels.find((level) => level.level === honorLevel)?.honorRarity
+        ) {
+          setDegreeFrameImage(
+            sub
+              ? degreeFrameSubMap[
+                  honor.levels.find((level) => level.level === honorLevel)!
+                    .honorRarity!
+                ]
+              : degreeFrameMap[
+                  honor.levels.find((level) => level.level === honorLevel)!
+                    .honorRarity!
+                ]
           );
         }
         if (
@@ -241,6 +281,14 @@ const DegreeImage: React.FC<
             region,
             true
           );
+        } else if (honor.honorMissionType) {
+          getRemoteAssetURL(
+            `honor/${honor.assetbundleName}_rip/scroll.webp`,
+            setDegreeRankImage,
+            "minio",
+            region,
+            true
+          );
         }
       }
       return () => {
@@ -248,7 +296,7 @@ const DegreeImage: React.FC<
         setDegreeFrameImage("");
         setDegreeRankImage("");
       };
-    }, [honor, honorGroup, region, sub, type]);
+    }, [honor, honorGroup, honorLevel, region, sub, type]);
 
     return honor === undefined ? null : !!honor ? (
       <Svg
@@ -273,6 +321,7 @@ const DegreeImage: React.FC<
         />
         {/* degree level */}
         {!!honorLevel &&
+          !!isDrawHonorLevel &&
           Array.from({ length: Math.min(5, honorLevel) }).map((_, idx) => (
             <image
               key={idx}
@@ -284,6 +333,7 @@ const DegreeImage: React.FC<
             />
           ))}
         {!!honorLevel &&
+          !!isDrawHonorLevel &&
           honorLevel - 5 > 0 &&
           Array.from({ length: honorLevel - 5 }).map((_, idx) => (
             <image

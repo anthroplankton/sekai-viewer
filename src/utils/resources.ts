@@ -137,7 +137,7 @@ export const degreeFrameMap: {
   middle: FrameDegreeM2,
 };
 
-export const degreeFramSubMap: {
+export const degreeFrameSubMap: {
   [key: string]: string;
 } = {
   high: FrameDegreeS3,
