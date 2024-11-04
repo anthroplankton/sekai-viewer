@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.6](https://github.com/Sekai-World/sekai-viewer/compare/v1.12.5...v1.12.6) (2024-11-04)
+
+
+### Bug Fixes
+
+* **honor:** do not override honorLevel from prop ([71690ff](https://github.com/Sekai-World/sekai-viewer/commits/71690ff7f19226c61e3dd43a1e65018be9cd3c2a))
+* **widgets:** compact costume 3d data for tw and kr servers ([2b014fe](https://github.com/Sekai-World/sekai-viewer/commits/2b014fe6758f887f69aa573aaea05054bda4d22a))
+* wrong locale key in HonorDetailDialog for reward titles ([a3defe3](https://github.com/Sekai-World/sekai-viewer/commits/a3defe349169e64172c75c1580e8f5358296eaf7))
+
+
+### Refactors
+
+* **helpers:** update threshold value in InfiniteScroll component ([5c8b7d3](https://github.com/Sekai-World/sekai-viewer/commits/5c8b7d3cd42bb723ca26e98722da9c08c5851836))
+* **honor:** improve rendering of honor titles ([1a41275](https://github.com/Sekai-World/sekai-viewer/commits/1a41275121998e5e0d83a2570235eadb3b354891))
+
 ### [1.12.5](https://github.com/Sekai-World/sekai-viewer/compare/v1.12.4...v1.12.5) (2024-10-14)
 
 
